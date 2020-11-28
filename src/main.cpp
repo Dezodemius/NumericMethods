@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <filesystem>
-#include <io.h>
 
 using namespace std;
 
@@ -27,10 +25,11 @@ int sgn(double x) {
 
 /**
  * Явная схемы решения дифф. уравнения.
- * @param M
- * @param N
- * @param kappa
- * @param U
+ * @param M Количество точек по времени.
+ * @param N Количество точек по координате.
+ * @param kappa Число Куранта.
+ * @param U Функция.
+ * @param nameNumber Номер функции начального распределения.
  */
 void implicitScheme(int M, int N, double kappa, double *const *U, int nameNumber) {
     char str[19];
@@ -57,10 +56,11 @@ void implicitScheme(int M, int N, double kappa, double *const *U, int nameNumber
 
 /**
  * Схема с ограничителем Ван Лира.
- * @param M
- * @param N
- * @param kappa
- * @param U
+ * @param M Количество точек по времени.
+ * @param N Количество точек по координате.
+ * @param kappa Число Куранта.
+ * @param U Функция.
+ * @param nameNumber Номер функции начального распределения.
  */
 void schemeWithVanLeerLimiter(int M, int N, double kappa, double *const *U, int nameNumber) {
     char str[32];
@@ -131,10 +131,17 @@ double step_function(double x){
  * @return Значение функции в точке x.
  */
 double triangle_function(double x){
-    if (abs(x) < 1.0)
-        return 1 - abs(x);
-    else
-        return 0.0;
+    double z = 1.0;
+
+    double a = 0.2;
+    double b = 0.4;
+    double c = 0.5 * (a + b);
+
+    if (x >= a && x < c)
+        return z * (x - a) / (c - a);
+    if (x <= b && x >= c)
+        return z - z * (x - c) / (b - c);
+    return 0.0;
 }
 
 /**
@@ -145,8 +152,11 @@ double triangle_function(double x){
  * @return Значение функции в точке x.
  */
 double sin_function(double x, double a, double b){
-    if (x >= a && x <= b)
-        return sin(x);
+    double z = 1.0;
+    double l = abs(b - a);
+
+    if (x > a && x < b)
+        return z * pow(sin((x - a) * M_PI / l), 2.0);
     return 0.0;
 }
 
@@ -174,8 +184,7 @@ void exactSolution(double a, double T0, double T1, double X0, double X1, double 
                    initialFuncType initialFunc, int nameNumber) {
     int M = floor((double)((T1 - T0) / tau));
     int N = floor((double)((X1 - X0) / h));
-    cout << "M: " << M << endl;
-    cout << "N: " << N << endl;
+    cout << "M: " << M << " N: " << N << endl;
 
     auto **U1 = new double*[M];
     for (int i = 0; i < M; i++)
@@ -221,8 +230,7 @@ void DiffEqSol(double a, double T0, double T1, double X0, double X1, double h, d
                initialFuncType initialFunc, int nameNumber){
     int M = floor((double)((T1 - T0) / tau));
     int N = floor((double)((X1 - X0) / h));
-    cout << "M: " << M << endl;
-    cout << "N: " << N << endl;
+    cout << "M: " << M << " N: " << N << endl;
 
     // Число Куранта.
     double kappa = a * tau / h;
@@ -266,10 +274,12 @@ int main() {
     double x0 = 0.0;
     double x1 = 1.0;
 
-    double h = 0.01;
-    GetStepByCount(x0, x1, 100, h);
-
-    double tau = 0.01;
+    double h = 0.0;
+//    GetStepByCount(x0, x1, 1000, h);
+//    h = 0.000505050505050;
+//    h = 0.005;
+    h = 0.001;
+    double tau = 0.001;
     double a = 0.5;
 
     schemeFuncType schemeFuncs[2] = {schemeWithVanLeerLimiter, implicitScheme};
@@ -281,7 +291,5 @@ int main() {
             exactSolution(a, t0, t1, x0, x1, h, tau, initialFuncs[i], i + 1);
         }
     }
-
-
     return 0;
 }

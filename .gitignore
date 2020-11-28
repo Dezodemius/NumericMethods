@@ -1,32 +1,12 @@
-# Prerequisites
-*.d
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+PlotScript/venv/
 
-# Precompiled Headers
-*.gch
-*.pch
+.idea/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+bin/
 
-# Fortran module files
-*.mod
-*.smod
+data/
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+gifs/
 
-# Executables
-*.exe
-*.out
-*.app
+pics/
